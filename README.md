@@ -15,9 +15,11 @@ In README file, the 5th line contains the speak gender information of all audio 
 Use fixed number of LSTM cells to take input from squential wave raw data. The hidden state of each cells are concated nated to 2-D matrix as output. The output data dimension is reduced by takeing average pooling in large strides. Then the output layer is stardard softmax on pooling results. The cost function is constructed by caculating the cross entroy between data label and softmax output from the networks.
 
 ### Mini Batch training
-The training process takes each tgz file as one mini batch.All 10 audio files are taken for one epoch of opitimizing process. Every 10 mini batch, the network prediction performance is validated by run 100 out-of-sample validation samples. The classification accuracy is printed by percentage. By using mini batch, the disk space and memory is saved. 
+The training process takes each tgz file as one mini batch.All 10 audio files are taken for one epoch of opitimizing process. Every 100 mini batch, the network prediction performance is validated by run 100 out-of-sample validation samples. The classification accuracy is printed by percentage. By using mini batch, the disk space and memory is saved. 
 
 ### Performance
+
+
 
 ### Requirments
 tensorflow, numpy, scipy
