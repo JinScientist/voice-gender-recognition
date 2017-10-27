@@ -40,6 +40,8 @@ The training process takes each tgz file as one mini batch.All 10 audio files ar
 | 1700         | 83.0%              |
 | 1800         | 83.30%             |
 | 1900         | 83.50%             |
+
+
 ![results](./train_results.png =25x)
 ### Requirments
 tensorflow, numpy, scipy
