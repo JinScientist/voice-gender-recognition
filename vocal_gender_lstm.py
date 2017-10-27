@@ -10,8 +10,8 @@ filelist=listdir(rawdata_path)
 print len(filelist)
 lstm_size=4
 batch_size=10
-num_batches=20000
-num_features=1
+num_batches=3000
+num_features=10
 sample_len=num_features*num_batches
 valid_sample_size=100
 
@@ -69,8 +69,9 @@ with graph.as_default():
 		current_batch = dataset[i]
 		# The value of state is updated after processing each batch of words.
 		output, state = lstm(current_batch, state)
-		if i==0:output_all=output
-		else:output_all=tf.concat([output_all,output],axis=2)
+		if i==0:output_all=tf.expand_dims(output,2)
+		else:
+			output_all=tf.concat([output_all,tf.expand_dims(output,2)],axis=2)
 		if i%1000==0:
 			print 'Graph built for %s cells' % i
 
