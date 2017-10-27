@@ -8,10 +8,10 @@ import tensorflow as tf
 rawdata_path='./rawdata/'
 filelist=listdir(rawdata_path)
 print len(filelist)
-lstm_size=8
+lstm_size=4
 batch_size=10
-num_batches=2000
-num_features=5
+num_batches=20000
+num_features=1
 sample_len=num_features*num_batches
 valid_sample_size=100
 
@@ -31,7 +31,9 @@ def labeling(filename):
 		if member.name.endswith('.wav'):
 			wavfile=tar.extractfile(member)
 			wave_single=read(wavfile)
-			wave_array=np.append(wave_array,np.reshape(wave_single[1][0:sample_len],[1,sample_len]),axis=0)
+			try:
+				wave_array=np.append(wave_array,np.reshape(wave_single[1][0:sample_len],[1,sample_len]),axis=0)
+			except Exception: pass
 	return wave_array,np.repeat(label,batch_size,axis=0)
 
 def generate_batch():
@@ -68,13 +70,17 @@ with graph.as_default():
 		# The value of state is updated after processing each batch of words.
 		output, state = lstm(current_batch, state)
 		if i==0:output_all=output
-		else:output_all=tf.concat([output_all,output],axis=1)
-		if i%100==0:
+		else:output_all=tf.concat([output_all,output],axis=2)
+		if i%1000==0:
 			print 'Graph built for %s cells' % i
-	W = tf.Variable(tf.zeros([lstm_size*num_batches, 2]))
-	b = tf.Variable(tf.zeros([2]))
+
 
 	target = tf.placeholder(tf.float32, [batch_size, 2]) 
+	output_all=tf.expand_dims(output_all, 3)
+	average_pool=tf.nn.avg_pool(output_all,ksize=[1,10,10,1])
+	flat=tf.layers.flatten(average_pool)
+	W = tf.Variable(tf.zeros([flat.shape[1], 2]))
+	b = tf.Variable(tf.zeros([2]))
 
 	print 'building logistic regression layer...'
 	pred = tf.nn.softmax(tf.matmul(output_all, W) + b) # Softmax
@@ -98,17 +104,6 @@ with tf.Session(graph=graph) as session:
 	print('Initialized')
 
 	for step in xrange(num_10samples):
-		if step%10==0:
-			file_index_valid=1601
-			accuracy_all=np.empty([1,valid_sample_size])
-			for j in range(valid_sample_size):
-				wave_valid,label_valid=gen_validation_batch()
-				wave_valid_devi=np.reshape(wave_valid,[batch_size,	num_batches,	num_features])
-				dataset_feed_valid=np.swapaxes(wave_valid_devi,0,1)
-				feed_valid = {dataset: dataset_feed_valid, target: label_valid}
-				accuracy_all[0,j] = session.run(accuracy, feed_dict=feed_valid)
-			accuracy_average=np.mean(accuracy_all)
-			print 'prediction accuracy after %s steps training: %s' % (step,	accuracy_average)	
 
 		wave_array,label=generate_batch()
 		print wave_array.shape
@@ -120,5 +115,17 @@ with tf.Session(graph=graph) as session:
 			_,cost_val = session.run([optimizer_ADAM,cost], feed_dict=feed_train)
 			print cost_val
 		except Exception: pass
+
+		if step%10==0:
+			file_index_valid=1601
+			accuracy_all=np.empty([1,valid_sample_size])
+			for j in range(valid_sample_size):
+				wave_valid,label_valid=gen_validation_batch()
+				wave_valid_devi=np.reshape(wave_valid,[batch_size,	num_batches,	num_features])
+				dataset_feed_valid=np.swapaxes(wave_valid_devi,0,1)
+				feed_valid = {dataset: dataset_feed_valid, target: label_valid}
+				accuracy_all[0,j] = session.run(accuracy, feed_dict=feed_valid)
+			accuracy_average=np.mean(accuracy_all)
+			print 'prediction accuracy after %s steps training: %s' % (step+1,	accuracy_average)	
 		
 	
