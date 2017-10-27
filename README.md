@@ -1,5 +1,5 @@
 # Voice Gender Recognition
-Train a LSTM neural networks on Vox Forge public audio data set to recognize speaker's gender
+Notic: This is the very first version of repo. Future work is required to push the prediction performance to higher level. 
 
 ### Summary
 Inspired by [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html). Here is an implementation repo for training a LSTM neurtal networks for recogonizing audio data's speaker gender. The audio data used is from  [Vox Forge](http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Audio/Main/16kHz_16bit/)
