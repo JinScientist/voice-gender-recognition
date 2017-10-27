@@ -18,20 +18,20 @@ Use fixed number of LSTM cells to take input from squential wave raw data. The h
 The training process takes each tgz file as one mini batch.All 10 audio files are taken for one epoch of opitimizing process. Every 100 mini batch, the network prediction performance is validated by run 100 out-of-sample validation samples. The classification accuracy is printed by percentage. By using mini batch, the disk space and memory is saved. 
 
 ### Performance
-| Mini Batches | Accuracy Achieved  |     | Mini Batches | Accuracy Achieved  |
-|--------------|--------------------|     |--------------|--------------------|
-| 1            | 63.20%             |     | 1000         | 81.70%             |
-| 100          | 71.30%             |     | 1100         | 81.70%             |
-| 200          | 74.50%             |     | 1200         | 82.30%             |
-| 300          | 75.70%             |     | 1300         | 82.40%             |
-| 400          | 78.0%              |     | 1400         | 82.20%             |
-| 500          | 79.10%             |     | 1500         | 82.40%             |
-| 600          | 79.50%             |     | 1600         | 82.70%             |
-| 700          | 80.20%             |     | 1700         | 83.0%              |
-| 800          | 80.90%             |     | 1800         | 83.30%             |
-| 900          | 81.30%             |     | 1900         | 83.50%             |
+| Mini Batches | Accuracy Achieved  | Mini Batches | Accuracy Achieved |
+|--------------|--------------------|--------------|-------------------|
+| 1            | 63.20%             | 1000         | 81.70%            |
+| 100          | 71.30%             | 1100         | 81.70%            |
+| 200          | 74.50%             | 1200         | 82.30%            |
+| 300          | 75.70%             | 1300         | 82.40%            |
+| 400          | 78.0%              | 1400         | 82.20%            |
+| 500          | 79.10%             | 1500         | 82.40%            |
+| 600          | 79.50%             | 1600         | 82.70%            |
+| 700          | 80.20%             | 1700         | 83.0%             |
+| 800          | 80.90%             | 1800         | 83.30%            |
+| 900          | 81.30%             | 1900         | 83.50%            |
 
-<img src="./train_results.png" width="200">
+<img src="./train_results.png" width="400">
 
 ### Requirments
 tensorflow, numpy, scipy
