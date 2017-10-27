@@ -19,3 +19,13 @@ The training process takes each tgz file as one mini batch.All 10 audio files ar
 
 ### Performance
 
+### Requirments
+tensorflow, numpy, scipy
+### Scripts
+The experiment can be reproduced by running following command:
+```
+mkdir rawdata
+python scrap.py
+python vocal_gender_lstm.py > ./train_results.txt
+```
+
