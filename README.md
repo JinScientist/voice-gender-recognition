@@ -3,6 +3,7 @@ Notic(2017-10-27): This is the very first version of repo. Future work is requir
 
 ### Summary
 Inspired by [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html). Here is an implementation repo for training a LSTM neurtal networks for recogonizing audio data's speaker gender. The audio data used is from  [Vox Forge](http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Audio/Main/16kHz_16bit/)
+Data Science is Science handling all problems without having domain knowledge. We assume no knowledge exist for data scientist in Audio signal processing. 'FFT' is an alternative optioin instead of letting the neural nets learn the audio signal logic from raw wave data them self.
 
 ### Scraping down tgz audio file
 Run [scrap.py](https://github.com/JinScientist/voice-gender-recognition/blob/master/scrap.py) will download every tgz file and save to local directory ./rawdata.
