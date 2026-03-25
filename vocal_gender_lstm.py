@@ -23,10 +23,11 @@ def labeling(filename):
 	tar = tarfile.open(rawdata_path+filename, "r:gz")
 	wave_array=np.empty([0,sample_len])
 	for member in tar.getmembers():
-		if member.name.endswith('README'):
+		if member.name.endswith('README') or member.name.endswith('readme'):
 			readmefile = tar.extractfile(member)
 			content=readmefile.readlines()[4]
-			if content=='Gender: Male\n':
+			content_str=content.decode('utf-8').strip().rstrip(';')
+			if content_str.lower()=='gender: male':
 				label=np.array([[1,0]],np.float32)
 			else:
 				label=np.array([[0,1]],np.float32)
