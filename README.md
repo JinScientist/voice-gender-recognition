@@ -1,45 +1,106 @@
 # Voice Gender Recognition
-Note(2017-10-27): This is the very first version of repo. Future work is required to push the prediction performance to higher level. 
 
-### Summary
-Inspired by [LSTM Networks for Sentiment Analysis](http://deeplearning.net/tutorial/lstm.html). Here is an implementation repo for training a LSTM neurtal networks for recogonizing audio data's speaker gender. The audio data used is from  [Vox Forge](http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Audio/Main/16kHz_16bit/). 
-Data Science is supposed to handle all kinds of problems without having domain knowledge. We assume no knowledge exist for data scientist in Audio signal processing. 'FFT' is an alternative optioin instead of letting the neural nets learn the audio signal logic from raw wave data them self.
+An LSTM-based neural network that classifies speaker gender from raw audio waveform data. Trained on the [VoxForge](http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Audio/Main/16kHz_16bit/) open speech corpus, achieving **83.5% accuracy** after 1900 training batches.
 
-### Scraping down tgz audio file
-Run [scrap.py](https://github.com/JinScientist/voice-gender-recognition/blob/master/scrap.py) will download every tgz file and save to local directory ./rawdata.
+## Overview
 
-### Parse the README file in each package
-In README file, the 5th line contains the speak gender information of all audio .wav files in the directory. The 'labeling' function in [vocal_gender_lstm.py](https://github.com/JinScientist/voice-gender-recognition/blob/master/vocal_gender_lstm.py) parse the README file and return the data label and wave raw data in the format of numpy array. 
+This project takes a domain-knowledge-free approach to audio classification — no FFT or manual feature engineering. The raw waveform is fed directly into an LSTM network, which learns to extract gender-relevant patterns on its own.
 
-### Neural Nets Graph
-Use fixed number of LSTM cells to take input from squential wave raw data. The hidden state of each cells are concated nated to 2-D matrix as output. The output data dimension is reduced by takeing average pooling in large strides. Then the output layer is stardard softmax on pooling results. The cost function is constructed by caculating the cross entroy between data label and softmax output from the networks.
+## Files
 
-### Mini Batch training
-The training process takes each tgz file as one mini batch.All 10 audio files are taken for one epoch of opitimizing process. Every 100 mini batch, the network prediction performance is validated by run 100 out-of-sample validation samples. The classification accuracy is printed by percentage. By using mini batch, the disk space and memory is saved. 
+| File | Description |
+|------|-------------|
+| `scrap.py` | Downloads all `.tgz` audio packages from VoxForge to `./rawdata/` |
+| `vocal_gender_lstm.py` | Main training script — builds and trains the LSTM model |
+| `train_results.png` | Accuracy curve over training batches |
+| `LICENSE` | MIT License |
 
-### Performance
-| Mini Batches | Accuracy Achieved  | Mini Batches | Accuracy Achieved |
-|--------------|--------------------|--------------|-------------------|
-| 1            | 63.20%             | 1000         | 81.70%            |
-| 100          | 71.30%             | 1100         | 81.70%            |
-| 200          | 74.50%             | 1200         | 82.30%            |
-| 300          | 75.70%             | 1300         | 82.40%            |
-| 400          | 78.0%              | 1400         | 82.20%            |
-| 500          | 79.10%             | 1500         | 82.40%            |
-| 600          | 79.50%             | 1600         | 82.70%            |
-| 700          | 80.20%             | 1700         | 83.0%             |
-| 800          | 80.90%             | 1800         | 83.30%            |
-| 900          | 81.30%             | 1900         | 83.50%            |
+## Architecture
 
-<img src="./train_results.png" width="400">
-
-### Requirments
-tensorflow, numpy, scipy
-### Scripts
-The experiment can be reproduced by running following command:
 ```
+Raw .wav (20,000 samples)
+        │
+        ▼
+  Reshape: [200 batches × 10 files × 100 features]
+        │
+        ▼
+  LSTM cells (hidden size = 2)
+        │
+        ▼
+  Concat hidden states → [10 × 2 × 200] matrix
+        │
+        ▼
+  Average Pooling (large stride)
+        │
+        ▼
+  Softmax → [Male, Female]
+```
+
+- **LSTM hidden size**: 2
+- **Batch size**: 10 audio files per batch (1 `.tgz` package)
+- **Input window**: 20,000 raw samples per file (split into 200 × 100 chunks)
+- **Optimizer**: Adam (lr=1e-4)
+- **Loss**: Cross-entropy
+
+## Requirements
+
+- Python 2.7
+- TensorFlow
+- NumPy
+- SciPy
+- BeautifulSoup (for scraping)
+
+```bash
+pip install tensorflow numpy scipy beautifulsoup
+```
+
+## Usage
+
+### Step 1 — Download the audio dataset
+
+```bash
 mkdir rawdata
 python scrap.py
+```
+
+> This scrapes ~2000+ `.tgz` files from VoxForge (~several GB). Allow time for download.
+
+### Step 2 — Train the model
+
+```bash
 python vocal_gender_lstm.py > ./train_results.txt
 ```
 
+Validation accuracy is printed every 100 batches.
+
+## Performance
+
+| Mini Batches | Accuracy | Mini Batches | Accuracy |
+|-------------|----------|-------------|----------|
+| 1           | 63.20%   | 1000        | 81.70%   |
+| 100         | 71.30%   | 1100        | 81.70%   |
+| 200         | 74.50%   | 1200        | 82.30%   |
+| 300         | 75.70%   | 1300        | 82.40%   |
+| 400         | 78.00%   | 1400        | 82.20%   |
+| 500         | 79.10%   | 1500        | 82.40%   |
+| 600         | 79.50%   | 1600        | 82.70%   |
+| 700         | 80.20%   | 1700        | 83.00%   |
+| 800         | 80.90%   | 1800        | 83.30%   |
+| 900         | 81.30%   | 1900        | **83.50%** |
+
+![Training Results](./train_results.png)
+
+## How Labeling Works
+
+Each `.tgz` package from VoxForge contains:
+- Multiple `.wav` audio files of one speaker
+- A `README` file whose 5th line contains `Gender: Male` or `Gender: Female`
+
+The `labeling()` function in `vocal_gender_lstm.py` parses this README and returns:
+- `[1, 0]` → Male
+- `[0, 1]` → Female
+
+## Notes
+
+- Trained and validated on 2000 + 100 `.tgz` files respectively
+- Future improvements: larger LSTM, batch normalization, FFT features
